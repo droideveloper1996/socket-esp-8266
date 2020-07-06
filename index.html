@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script>
+      const socket = io("http://localhost:4000");
+      socket.on("welcome", (data) => {
+        console.log(data);
+        socket.emit("acknowledge", {
+          from: "esp",
+          message: "I am connected to server",
+        });
+      });
+    </script>
+  </body>
+</html>
