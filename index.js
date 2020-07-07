@@ -24,6 +24,8 @@
 var app = require("express")();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
+var fs = require("fs");
+const { json } = require("express");
 var light = { state: false };
 app.get("/", function (req, res) {
   res.sendFile(__dirname + "/index.html");
@@ -39,6 +41,50 @@ io.on("connection", function (socket) {
     console.log("id: " + socket.id + " light: " + light.state);
     io.sockets.emit("light", light);
   });
+  socket.on("basant", (data) => {
+    if (data) {
+      //console.log(data);
+      const apiKey = data.apiKey;
+      const humidity = data.humidity;
+      const temp = data.temp;
+      const timestamp = Date.now();
+
+      const payLoad = {
+        humidity,
+        temp,
+        timestamp,
+      };
+
+      fs.appendFile(
+        `dataCollected-${apiKey}.txt`,
+        JSON.stringify(payLoad) + "\n",
+        function (err) {
+          if (err) throw err;
+        }
+      );
+    }
+
+    fs.readFile(
+      `dataCollected-${data.apiKey}.txt`,
+      "utf8",
+      (error, filedata) => {
+        if (error) {
+          console.log("Error Reading file");
+        } else {
+          var _array = [];
+          _array = filedata.split(/\n|\r/g);
+          // console.log(_array);
+          _array.pop();
+          // _array.forEach((ele) => {
+          //   console.log(JSON.parse(ele).humidity);
+          // });
+          socket.emit("track-live", _array);
+        }
+      }
+    );
+  });
+
+  socket.on("bablu", (data) => {});
 });
 http.listen(3000, function () {
   console.log("listening on *:3000");
