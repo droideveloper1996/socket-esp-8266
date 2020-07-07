@@ -84,7 +84,14 @@ io.on("connection", function (socket) {
     );
   });
 
-  socket.on("bablu", (data) => {});
+  socket.on("clearLogs", (data) => {
+    if (data) {
+      fs.unlink(`dataCollected-${data.apiKey}.txt`, function (err) {
+        if (err) throw err;
+        console.log("File deleted!");
+      });
+    }
+  });
 });
 http.listen(3000, function () {
   console.log("listening on *:3000");
