@@ -1,64 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-  <head>
-    
-    <title>Dex Esp Socket</title>
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <h2>ESP Socket test</h2>
-        <div>
-          <h4>Handshake Data From Esp When Connected</h4>
-          <div class="alert alert-danger" id="from"></div>
-          <div class="alert alert-info" id="data"></div>
-        </div>
-        <button class="btn btn-primary" id="refresh">
-          Check Device Status
-        </button>
-        <button class="btn btn-primary" id="toggle">Toggle</button>
-      </div>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-    <script>
-      const fromref = document.getElementById("from");
-      const dataref = document.getElementById("data");
-      const btn = document.getElementById("refresh");
-      const toggle = document.getElementById("toggle");
-      var action = true;
-      btn.onclick = () => {
-        window.location.reload();
-      };
-
-      const socket = io("http://13.232.193.81:4000/");
-      socket.on("welcome", (data) => {
-        console.log(data);
-        socket.emit("acknowledge", {
-          from: "esp",
-          message: "I am connected to server",
-        });
-        fromref.innerText = data.from;
-        dataref.innerText = data.data;
-      });
-      socket.on("disconnect", () => {
-        console.log("Device Disconnected");
-        fromref.innerText = "Device Disconnected";
-        dataref.innerText = "";
-      });
-
-      toggle.onclick = () => {
-        socket.emit("toggle", !action);
-        action = !action;
-      };
-
-      socket.on("light", (data) => {
-        alert(data);
-        console.log("From Light Event", data);
-      });
-    </script>
-  </body>
-</html> -->
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -135,7 +74,9 @@
       var ctx2 = document.getElementById("myChart2").getContext("2d");
       const clearLogs = document.getElementById("clearLogs");
       const dataset = document.getElementById("dataset");
-      const socket = io("http://13.232.193.81:3000/");
+      // const socket = io("http://13.232.193.81:4000/");
+      const socket = io("http://localhost:4000/");
+
       $("#toggleButton").on("click", function () {
         socket.emit("toggle", { state: true });
       });
@@ -146,12 +87,11 @@
         } else {
           $("#light").text("off");
         }
-        const payload = {
-          apiKey: "esp8266",
-          temp: "40",
-          humidity: "58",
-        };
+
         btnBasant.onclick = () => {
+          const payload = `apiKey: esp8266,temp: ${Math.floor(
+            Math.random() * 100
+          )},humidity: ${Math.floor(Math.random() * 100)}`;
           socket.emit("basant", payload);
         };
       });

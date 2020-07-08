@@ -41,7 +41,16 @@ io.on("connection", function (socket) {
     console.log("id: " + socket.id + " light: " + light.state);
     io.sockets.emit("light", light);
   });
-  socket.on("basant", (data) => {
+  socket.on("basant", (_data) => {
+    var j = [];
+    j = _data.split(",");
+    var data = {};
+    j.forEach((element) => {
+      const tatti = element.split(":");
+      data[tatti[0].trim()] = tatti[1].trim();
+    });
+    console.log(data);
+
     if (data) {
       //console.log(data);
       const apiKey = data.apiKey;
@@ -87,12 +96,14 @@ io.on("connection", function (socket) {
   socket.on("clearLogs", (data) => {
     if (data) {
       fs.unlink(`dataCollected-${data.apiKey}.txt`, function (err) {
-        if (err) throw err;
+        if (err) {
+          console.log("No Such File Exists or Something went Wrong");
+        }
         console.log("File deleted!");
       });
     }
   });
 });
-http.listen(3000, function () {
-  console.log("listening on *:3000");
+http.listen(4000, function () {
+  console.log("listening on *:4000");
 });
