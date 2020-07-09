@@ -7,7 +7,12 @@ const dataset = document.getElementById("dataset");
 const deviceId = document.getElementById("deviceId");
 const save = document.getElementById("save");
 const edit = document.getElementById("edit");
+const graph = document.getElementById("graph");
+const loading = document.getElementById("loading");
 let key = localStorage.getItem("DeviceId");
+
+const socket = io("http://13.232.193.81:3000/");
+// const socket = io("http://localhost:3000/");
 
 edit.onclick = () => {
   localStorage.removeItem("DeviceId");
@@ -18,20 +23,18 @@ edit.onclick = () => {
 if (key != null) {
   deviceId.value = key;
   deviceId.setAttribute("disabled", true);
-  // save.setAttribute("hidden", true);
+  socket.emit("device-id", key);
 }
 
 save.onclick = () => {
   localStorage.setItem("DeviceId", deviceId.value);
   deviceId.setAttribute("disabled", true);
   key = deviceId.value;
+  socket.emit("device-id", key);
 };
 
-// const socket = io("http://13.232.193.81:3000/");
-const socket = io("http://localhost:3000/");
-
-// DrawChart([], [], ctx1, "Temperature");
-// DrawChart([], [], ctx2, "Humidity");
+DrawChart([], [], ctx1, "Temperature");
+DrawChart([], [], ctx2, "Humidity");
 
 $("#toggleButton").on("click", function () {
   socket.emit("toggle", { state: true });
@@ -72,6 +75,7 @@ var yLabel = [];
 var _x_data = [];
 
 socket.on("track-live", (data) => {
+  show();
   console.log("TrackLive Event Fired");
   data.reverse();
   dataset.innerText = data;
@@ -87,3 +91,10 @@ socket.on("track-live", (data) => {
   DrawChart(yLabel, _x_data, ctx1, "Temperature");
   DrawChart(xLabel, _x_data, ctx2, "Humidity");
 });
+
+const show = () => {
+  if (graph.style.display == "none") {
+    loading.style.display("none");
+    graph.style.display("block");
+  }
+};

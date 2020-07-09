@@ -7,10 +7,15 @@ const { json } = require("express");
 var light = { state: false };
 app.use(express.static("public"));
 app.get("/", function (req, res) {
-  res.sendFile(__dirname + "/public/index.html");
+  // res.sendFile(__dirname + "/public/index.html");
+  res.sendFile("/public/index.html");
 });
 io.on("connection", function (socket) {
-  console.log("User connected: " + socket.id);
+  socket.on("device-id", (data) => {
+    socket.join(data);
+    console.log("Channel Joined ", data);
+  });
+
   socket.emit("light", light);
   socket.on("disconnect", function () {
     console.log("User disconnected: " + socket.id);
@@ -61,8 +66,7 @@ io.on("connection", function (socket) {
           var _array = [];
           _array = filedata.split(/\n|\r/g);
           _array.pop();
-          // console.log(_array.length);
-          io.emit("track-live", _array);
+          io.in(data.apiKey).emit("track-live", _array);
         }
       }
     );
@@ -83,3 +87,8 @@ io.on("connection", function (socket) {
 http.listen(3000, function () {
   console.log("listening on *:3000");
 });
+
+/***
+ * Sending to all the client in room apikey
+ *
+ */
