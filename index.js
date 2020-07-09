@@ -1,34 +1,13 @@
-// const express = require("express");
-// const http = require("http");
-// const app = express();
-// const server = http.createServer(app);
-// const io = require("socket.io")(server);
-// const PORT = process.env.PORT || 4000;
-
-// io.on("connection", (socket) => {
-//   const greeting = {
-//     from: "Server",
-//     data: `Welcome ESP-8266 your socket id is -->${socket.id} `,
-//   };
-//   console.log(` New Device Communicated with Socket ID ${socket.id}`);
-//   io.to(socket.id).emit("welcome", greeting);
-//   socket.on("acknowledge", (data) => {
-//     console.log(data);
-//   });
-// });
-
-// server.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
-
-var app = require("express")();
+const express = require("express");
+var app = express();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var fs = require("fs");
 const { json } = require("express");
 var light = { state: false };
+app.use(express.static("public"));
 app.get("/", function (req, res) {
-  res.sendFile(__dirname + "/index.html");
+  res.sendFile(__dirname + "/public/index.html");
 });
 io.on("connection", function (socket) {
   console.log("User connected: " + socket.id);
@@ -52,7 +31,6 @@ io.on("connection", function (socket) {
     console.log(data);
 
     if (data) {
-      //console.log(data);
       const apiKey = data.apiKey;
       const humidity = data.humidity;
       const temp = data.temp;
@@ -82,13 +60,9 @@ io.on("connection", function (socket) {
         } else {
           var _array = [];
           _array = filedata.split(/\n|\r/g);
-          // console.log(_array);
           _array.pop();
-          // _array.forEach((ele) => {
-          //   console.log(JSON.parse(ele).humidity);
-          // });
-         console.log(_array.length);
-          socket.broadcast.emit("track-live", _array);
+          // console.log(_array.length);
+          io.emit("track-live", _array);
         }
       }
     );
@@ -105,6 +79,7 @@ io.on("connection", function (socket) {
     }
   });
 });
+
 http.listen(3000, function () {
   console.log("listening on *:3000");
 });
