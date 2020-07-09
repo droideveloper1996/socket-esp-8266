@@ -87,7 +87,8 @@ io.on("connection", function (socket) {
           // _array.forEach((ele) => {
           //   console.log(JSON.parse(ele).humidity);
           // });
-          socket.emit("track-live", _array);
+         console.log(_array.length);
+          socket.broadcast.emit("track-live", _array);
         }
       }
     );
@@ -104,6 +105,6 @@ io.on("connection", function (socket) {
     }
   });
 });
-http.listen(4000, function () {
-  console.log("listening on *:4000");
+http.listen(3000, function () {
+  console.log("listening on *:3000");
 });

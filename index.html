@@ -57,9 +57,9 @@
           <canvas id="myChart2" width="400" height="400"></canvas>
         </div>
         <div class="col-sm-6">
-          <div class="jumbotron">
+          <div class="jumbotron alert alert-info">
             <h2>Data From Logs</h2>
-            <div id="dataset"></div>
+            <div style="overflow:scroll; height:400px;"  id="dataset"></div>
           </div>
         </div>
       </div>
@@ -74,8 +74,8 @@
       var ctx2 = document.getElementById("myChart2").getContext("2d");
       const clearLogs = document.getElementById("clearLogs");
       const dataset = document.getElementById("dataset");
-      // const socket = io("http://13.232.193.81:4000/");
-      const socket = io("http://localhost:4000/");
+      const socket = io("http://13.232.193.81:3000/");
+//      const socket = io("http://localhost:4000/");
 
       $("#toggleButton").on("click", function () {
         socket.emit("toggle", { state: true });
@@ -89,10 +89,10 @@
         }
 
         btnBasant.onclick = () => {
-          const payload = `apiKey: esp8266,temp: ${Math.floor(
-            Math.random() * 100
-          )},humidity: ${Math.floor(Math.random() * 100)}`;
-          socket.emit("basant", payload);
+       //   const payload = `apiKey: esp8266,temp: ${Math.floor(
+          //  Math.random() * 100
+         // )},humidity: ${Math.floor(Math.random() * 100)}`;
+         // socket.emit("basant", payload);
         };
       });
       clearLogs.onclick = () => {
@@ -100,23 +100,32 @@
       };
 
       var xLabel = [];
-      var yLabel = [6, 7, 0];
+      var yLabel = [];
+      var _x_data = [];
+	
       socket.on("track-live", (data) => {
+	//console.log(data);
+	data.reverse();
         dataset.innerText = data;
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i <10; i++) {
           const item = JSON.parse(data[i]);
           xLabel[i] = parseInt(item.humidity);
           yLabel[i] = parseInt(item.temp);
+          _x_data[i]=i;
+          
         }
-        drawChart(yLabel, ctx1, "Temperature");
-        drawChart(xLabel, ctx2, "Humidity");
+        //console.log("yLabel",yLabel);
+        //console.log("xLabel",xLabel);
+        //console.log("_x_data",_x_data);
+        drawChart(yLabel,_x_data ,ctx1, "Temperature");
+        drawChart(xLabel,_x_data,ctx2, "Humidity");
       });
-
-      drawChart = (trainData, ctx, label) => {
+       
+      drawChart = (trainData, _Xdata,ctx, label) => {
         var myChart = new Chart(ctx, {
           type: "line",
           data: {
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            labels: [1,2,3,4,5,6,7,8,9,10],
             datasets: [
               {
                 label: label,
