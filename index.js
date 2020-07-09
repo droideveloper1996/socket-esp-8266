@@ -25,7 +25,7 @@ io.on("connection", function (socket) {
     console.log("id: " + socket.id + " light: " + light.state);
     io.sockets.emit("light", light);
   });
-  socket.on("basant", (_data) => {
+  socket.on("track-data", (_data) => {
     var j = [];
     j = _data.split(",");
     var data = {};

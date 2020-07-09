@@ -1,5 +1,5 @@
 import { DrawChart } from "../scripts/charts.js";
-const btnBasant = document.getElementById("basant");
+const trackData = document.getElementById("trackData");
 var ctx1 = document.getElementById("myChart1").getContext("2d");
 var ctx2 = document.getElementById("myChart2").getContext("2d");
 const clearLogs = document.getElementById("clearLogs");
@@ -36,10 +36,10 @@ save.onclick = () => {
 DrawChart([], [], ctx1, "Temperature");
 DrawChart([], [], ctx2, "Humidity");
 
-$("#toggleButton").on("click", function () {
-  socket.emit("toggle", { state: true });
+$("#goLive").on("click", function () {
+  socket.emit("get-live", { state: true });
 });
-socket.on("light", function (light) {
+socket.on("get-live", function (light) {
   console.log(light);
   if (light.state) {
     $("#light").text("ON");
@@ -47,7 +47,7 @@ socket.on("light", function (light) {
     $("#light").text("off");
   }
 
-  btnBasant.onclick = () => {
+  trackData.onclick = () => {
     if (key == null) {
       alert("ApiKey or DeviceId is undefined");
       return;
@@ -55,7 +55,7 @@ socket.on("light", function (light) {
     const payload = `apiKey: ${key},temp: ${Math.floor(
       Math.random() * 100
     )},humidity: ${Math.floor(Math.random() * 100)}`;
-    socket.emit("basant", payload);
+    socket.emit("track-data", payload);
   };
 });
 
@@ -75,7 +75,6 @@ var yLabel = [];
 var _x_data = [];
 
 socket.on("track-live", (data) => {
-  show();
   console.log("TrackLive Event Fired");
   data.reverse();
   dataset.innerText = data;
@@ -91,10 +90,3 @@ socket.on("track-live", (data) => {
   DrawChart(yLabel, _x_data, ctx1, "Temperature");
   DrawChart(xLabel, _x_data, ctx2, "Humidity");
 });
-
-const show = () => {
-  if (graph.style.display == "none") {
-    loading.style.display("none");
-    graph.style.display("block");
-  }
-};
