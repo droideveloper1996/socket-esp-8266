@@ -1,5 +1,5 @@
 import { DrawChart } from "../scripts/charts.js";
-const trackData = document.getElementById("trackData");
+const _trackData = document.getElementById("_trackData");
 var ctx1 = document.getElementById("myChart1").getContext("2d");
 var ctx2 = document.getElementById("myChart2").getContext("2d");
 const clearLogs = document.getElementById("clearLogs");
@@ -7,12 +7,14 @@ const dataset = document.getElementById("dataset");
 const deviceId = document.getElementById("deviceId");
 const save = document.getElementById("save");
 const edit = document.getElementById("edit");
-const graph = document.getElementById("graph");
+const liveDataSensor = document.getElementById("live-data-sensor");
 const loading = document.getElementById("loading");
 let key = localStorage.getItem("DeviceId");
 
 const socket = io("http://13.232.193.81:3000/");
 // const socket = io("http://localhost:3000/");
+
+liveDataSensor.style.display = "none";
 
 edit.onclick = () => {
   localStorage.removeItem("DeviceId");
@@ -37,27 +39,31 @@ DrawChart([], [], ctx1, "Temperature");
 DrawChart([], [], ctx2, "Humidity");
 
 $("#goLive").on("click", function () {
-  socket.emit("get-live", { state: true });
+  socket.emit("fetch-live", { state: true });
 });
-socket.on("get-live", function (light) {
-  console.log(light);
-  if (light.state) {
-    $("#light").text("ON");
-  } else {
-    $("#light").text("off");
-  }
 
-  trackData.onclick = () => {
-    if (key == null) {
-      alert("ApiKey or DeviceId is undefined");
-      return;
+socket.on("live-data-to-user", function (liveData) {
+  if (liveData) {
+    if ((liveDataSensor.style.display = "none")) {
+      liveDataSensor.style.display = "block";
     }
-    const payload = `apiKey: ${key},temp: ${Math.floor(
-      Math.random() * 100
-    )},humidity: ${Math.floor(Math.random() * 100)}`;
-    socket.emit("track-data", payload);
-  };
+    $("#live-data-sensor").text(
+      `Temperature :${liveData.temp}, Humidity :${liveDate.humidity}`
+    );
+  }
 });
+
+_trackData.onclick = () => {
+  console.log("taati");
+  if (key == null) {
+    alert("ApiKey or DeviceId is undefined");
+    return;
+  }
+  const payload = `apiKey: ${key},temp: ${Math.floor(
+    Math.random() * 100
+  )},humidity: ${Math.floor(Math.random() * 100)}`;
+  socket.emit("track-data", payload);
+};
 
 clearLogs.onclick = () => {
   if (key == null) {

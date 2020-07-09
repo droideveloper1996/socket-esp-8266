@@ -16,15 +16,18 @@ io.on("connection", function (socket) {
     console.log("Channel Joined ", data);
   });
 
-  socket.emit("light", light);
+  socket.on("fetch-live", (data) => {
+    socket.emit("get-live", data);
+  });
+
+  socket.on("push-live", (data) => {
+    socket.emit("live-data-to-user", data);
+  });
+
   socket.on("disconnect", function () {
     console.log("User disconnected: " + socket.id);
   });
-  socket.on("toggle", function (state) {
-    light.state = !light.state;
-    console.log("id: " + socket.id + " light: " + light.state);
-    io.sockets.emit("light", light);
-  });
+
   socket.on("track-data", (_data) => {
     var j = [];
     j = _data.split(",");
