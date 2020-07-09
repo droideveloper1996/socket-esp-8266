@@ -17,10 +17,12 @@ io.on("connection", function (socket) {
   });
 
   socket.on("fetch-live", (data) => {
-    socket.emit("get-live", data);
+    console.log("---------Requesting Live Data From Sensor--------");
+    socket.emit("light", { state: true });
   });
 
   socket.on("push-live", (data) => {
+    console.log("Received Live Data", data);
     socket.emit("live-data-to-user", data);
   });
 

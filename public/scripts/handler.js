@@ -39,6 +39,7 @@ DrawChart([], [], ctx1, "Temperature");
 DrawChart([], [], ctx2, "Humidity");
 
 $("#goLive").on("click", function () {
+  // alert();
   socket.emit("fetch-live", { state: true });
 });
 
@@ -48,7 +49,7 @@ socket.on("live-data-to-user", function (liveData) {
       liveDataSensor.style.display = "block";
     }
     $("#live-data-sensor").text(
-      `Temperature :${liveData.temp}, Humidity :${liveDate.humidity}`
+      `Temperature:${liveData.temp}, Humidity:${liveData.humidity}`
     );
   }
 });
