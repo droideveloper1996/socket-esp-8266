@@ -1,1 +1,0 @@
-{"humidity":"8","temp":"74","timestamp":1594315848135}
