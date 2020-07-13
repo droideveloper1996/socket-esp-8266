@@ -10,20 +10,24 @@ app.get("/", function (req, res) {
   // res.sendFile(__dirname + "/public/index.html");
   res.sendFile("/public/index.html");
 });
+var deviceId;
 io.on("connection", function (socket) {
   socket.on("device-id", (data) => {
-    socket.join(data);
+    socket.join(data, () => {
+      deviceId = data;
+    });
+
     console.log("Channel Joined ", data);
   });
 
   socket.on("fetch-live", (data) => {
     console.log("---------Requesting Live Data From Sensor--------");
-    socket.emit("light", { state: true });
+    io.in(data.apiKey).emit("light", { state: true });
   });
 
   socket.on("push-live", (data) => {
     console.log("Received Live Data", data);
-    socket.emit("live-data-to-user", data);
+    io.in(data.apiKey).emit("live-data-to-user", data);
   });
 
   socket.on("disconnect", function () {
@@ -53,7 +57,7 @@ io.on("connection", function (socket) {
       };
 
       fs.appendFile(
-        `dataCollected-${apiKey}.txt`,
+        `dataCollected-${deviceId}.txt`,
         JSON.stringify(payLoad) + "\n",
         function (err) {
           if (err) throw err;
@@ -61,25 +65,21 @@ io.on("connection", function (socket) {
       );
     }
 
-    fs.readFile(
-      `dataCollected-${data.apiKey}.txt`,
-      "utf8",
-      (error, filedata) => {
-        if (error) {
-          console.log("Error Reading file");
-        } else {
-          var _array = [];
-          _array = filedata.split(/\n|\r/g);
-          _array.pop();
-          io.in(data.apiKey).emit("track-live", _array);
-        }
+    fs.readFile(`dataCollected-${deviceId}.txt`, "utf8", (error, filedata) => {
+      if (error) {
+        console.log("Error Reading file");
+      } else {
+        var _array = [];
+        _array = filedata.split(/\n|\r/g);
+        _array.pop();
+        io.in(data.apiKey).emit("track-live", _array);
       }
-    );
+    });
   });
 
   socket.on("clearLogs", (data) => {
     if (data) {
-      fs.unlink(`dataCollected-${data.apiKey}.txt`, function (err) {
+      fs.unlink(`dataCollected-${deviceId}.txt`, function (err) {
         if (err) {
           console.log("No Such File Exists or Something went Wrong");
         }

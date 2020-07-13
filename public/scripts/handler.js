@@ -55,7 +55,7 @@ socket.on("live-data-to-user", function (liveData) {
 });
 
 _trackData.onclick = () => {
-  console.log("taati");
+  // console.log("taati");
   if (key == null) {
     alert("ApiKey or DeviceId is undefined");
     return;
