@@ -25,6 +25,11 @@ io.on("connection", function (socket) {
     io.in(data.apiKey).emit("light", { state: true });
   });
 
+socket.on("fall-event",(data)=>{
+if(data){
+  console.log("Ohhh! Seems Patient had a fall");
+  }
+});
   socket.on("push-live", (data) => {
     console.log("Received Live Data", data);
     io.in(data.apiKey).emit("live-data-to-user", data);
