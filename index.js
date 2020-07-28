@@ -22,7 +22,8 @@ io.on("connection", function (socket) {
 
   socket.on("fetch-live", (data) => {
     console.log("---------Requesting Live Data From Sensor--------");
-    io.in(data.apiKey).emit("light", { state: true });
+   console.log(data.apiKey); 
+   io.in(deviceId).emit("light", { state: true });
   });
 
 socket.on("fall-event",(data)=>{
@@ -40,6 +41,7 @@ if(data){
   });
 
   socket.on("track-data", (_data) => {
+console.log("motherfuckers ",_data);
     var j = [];
     j = _data.split(",");
     var data = {};
@@ -50,7 +52,7 @@ if(data){
     console.log(data);
 
     if (data) {
-      const apiKey = data.apiKey;
+      
       const humidity = data.humidity;
       const temp = data.temp;
       const timestamp = Date.now();
@@ -94,6 +96,9 @@ if(data){
   });
 });
 
+app.get('/test-end-point',(req,res)=>{
+	res.status(200).json({message:'test end point hot succesful'});
+});
 http.listen(3000, function () {
   console.log("listening on *:3000");
 });
