@@ -10,8 +10,10 @@ const edit = document.getElementById("edit");
 const liveDataSensor = document.getElementById("live-data-sensor");
 const loading = document.getElementById("loading");
 let key = localStorage.getItem("DeviceId");
-
+const ota=document.getElementById("ota");
 const socket = io("http://13.232.193.81:3000/");
+const otaStatus=document.getElementById("ota-status");
+//const otaID=document.getElementById("ota-id");
 // const socket = io("http://localhost:3000/");
 
 liveDataSensor.style.display = "none";
@@ -35,6 +37,10 @@ save.onclick = () => {
   socket.emit("device-id", key);
 };
 
+ota.onclick=()=>{
+   console.log("OTA Requested");
+   socket.emit("push-ota","http://api.senspark.io:3000/OTA/download");
+}
 DrawChart([], [], ctx1, "Temperature");
 DrawChart([], [], ctx2, "Humidity");
 
@@ -52,6 +58,16 @@ socket.on("live-data-to-user", function (liveData) {
       `Temperature:${liveData.temp}, Humidity:${liveData.humidity}`
     );
   }
+});
+
+socket.on("ota-action-status",(data)=>{
+	console.log(data);
+	otaStatus.innerText=data;
+});
+
+socket.on("ota-id",(data)=>{
+	console.log("OTA-ID",data);
+//	ota-id.innerText=data;
 });
 
 _trackData.onclick = () => {

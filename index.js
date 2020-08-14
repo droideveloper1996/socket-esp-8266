@@ -10,8 +10,14 @@ app.get("/", function (req, res) {
   // res.sendFile(__dirname + "/public/index.html");
   res.sendFile("/public/index.html");
 });
+
+app.get('/OTA/download/',(req,res)=>{
+  const file = `${__dirname}/public/firmware/v1/firmware.bin`;
+  res.download(file);
+})
 var deviceId;
 io.on("connection", function (socket) {
+ console.log("A new Client Joined via Socket",socket.id);
   socket.on("device-id", (data) => {
     socket.join(data, () => {
       deviceId = data;
@@ -20,9 +26,12 @@ io.on("connection", function (socket) {
     console.log("Channel Joined ", data);
   });
 
-  socket.on("fetch-live", (data) => {
+socket.on("device-update-status",data=>{	
+	console.log("OTA-Confirmation from device",data);
+});
+ socket.on("fetch-live", (data) => {
     console.log("---------Requesting Live Data From Sensor--------");
-   console.log(data.apiKey); 
+   console.log("Fetch-Live Device Key",deviceId); 
    io.in(deviceId).emit("light", { state: true });
   });
 
@@ -31,16 +40,28 @@ if(data){
   console.log("Ohhh! Seems Patient had a fall");
   }
 });
+socket.on("push-ota",(data)=>{
+
+const otaID=Math.floor((Math.random()*1000000)+1);
+io.in(deviceId).emit("ota-update",data+otaID);
+io.in(deviceId).emit("ota-id",otaID);
+console.log(`OTA requested by Client console -${deviceId} `,data+otaID)
+
+//  io.in(deviceId).emit("ota-action-status",200);
+});
   socket.on("push-live", (data) => {
     console.log("Received Live Data", data);
     io.in(data.apiKey).emit("live-data-to-user", data);
   });
-
+socket.on("ota-status",(data)=>{
+ console.log("OTA STATUS ",data);
+ io.in(deviceId).emit("ota-action-status",data);
+});
   socket.on("disconnect", function () {
     console.log("User disconnected: " + socket.id);
   });
 
-  socket.on("track-data", (_data) => {
+socket.on("track-data", (_data) => {
 console.log("motherfuckers ",_data);
     var j = [];
     j = _data.split(",");
@@ -52,7 +73,7 @@ console.log("motherfuckers ",_data);
     console.log(data);
 
     if (data) {
-      
+
       const humidity = data.humidity;
       const temp = data.temp;
       const timestamp = Date.now();
